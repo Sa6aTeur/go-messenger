@@ -1,0 +1,12 @@
+version: '3'
+services:
+  postgresql-db:
+    image: postgres:15.0-alpine
+    container_name: pg-go-messenger
+    restart: always
+    env_file:
+      - .env.pg.dev
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432

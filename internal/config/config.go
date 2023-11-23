@@ -9,7 +9,7 @@ import (
 type DbConfig struct {
 	Port     string `yaml:"port" env:"PORT" env-default:"5432"`
 	Host     string `yaml:"host" env:"HOST" env-default:"localhost"`
-	Name     string `yaml:"name" env:"NAME" env-default:"postgres"`
+	DbName     string `yaml:"db-name" env:"NAME" env-default:"postgres"`
 	User     string `yaml:"user" env-default:"user"`
 	Password string `yaml:"password" env:"PASSWORD"`
 }
@@ -24,7 +24,7 @@ var once sync.Once
 
 func GetConfig() AppConfig {
 	once.Do(func() {
-		err := cleanenv.ReadConfig("config/app-config.yml", &config)
+		err := cleanenv.ReadConfig("internal/config/app-config.yml", &config)
 		if err != nil {
 			panic(err)
 		}
