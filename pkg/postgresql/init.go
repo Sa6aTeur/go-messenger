@@ -9,7 +9,6 @@ import (
 )
 
 func Init(connString string, ctx context.Context) *pgxpool.Pool {
-	fmt.Println("ConnPGX", connString)
 
 	conn, err := pgxpool.New(ctx, connString)
 	if err != nil {

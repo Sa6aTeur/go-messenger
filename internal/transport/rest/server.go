@@ -4,13 +4,16 @@ import (
 	"context"
 	"fmt"
 	"go-messenger/internal/config"
-	"go-messenger/pkg/postgresql"
+	"go-messenger/internal/service"
+	"go-messenger/internal/storage/psql"
+	"go-messenger/internal/transport/rest/handler"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 const (
@@ -21,25 +24,21 @@ type RestServer struct {
 	httpServer *http.Server
 }
 
-func NewRestServer(ctx context.Context) RestServer {
+func NewRestServer(dbPool *pgxpool.Pool) RestServer {
 	cfg := config.GetConfig()
-	dbCfg := cfg.Db
-	connString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", dbCfg.User, dbCfg.Password, dbCfg.Host, dbCfg.Port, dbCfg.DbName)
 
-	cnPool := postgresql.Init(connString, ctx)
+	storages := psql.New(dbPool)
 
-	// place to register all storages with db
+	//place to register all services with storages
+	userService := service.NewUserService(storages.UserStorage)
 
-	//
-
-	//place to register all services with storage
-
-	//
+	//place to register all handlers with services
+	userH := handler.NewUserHandler(userService)
 
 	mainRouter := gin.Default()
-	//place to register all handlers
-
-	//
+	
+	//place to register all endpoints
+	userH.RegisterEndpoints(mainRouter)
 
 	httpServer := &http.Server{
 		Addr:           ":" + cfg.AppPort,
